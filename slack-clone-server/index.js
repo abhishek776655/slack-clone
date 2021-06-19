@@ -3,13 +3,19 @@ import resolvers from "./resolvers";
 
 import models from "./models";
 import typeDefs from "./schema";
+import { getUser } from "./auth";
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
+const SECRET = "rfdeskfpsgjkdjfglkdsj";
+const SECRET2 = "rfdeskfdsadsadsadsadd";
 const server = new ApolloServer({
   schema,
-  context: {
-    models,
-    user: 1,
+  context: ({ req }) => {
+    const token = req.headers.authorization || "";
+    console.log(token);
+    const user = getUser(token, SECRET);
+
+    return { user, models, SECRET, SECRET2 };
   },
 });
 

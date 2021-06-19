@@ -4,15 +4,17 @@ import {
   Header,
   Container,
   Button,
-  Message,
   Form,
   FormField,
+  Message,
 } from "semantic-ui-react";
 import { gql, useMutation } from "@apollo/client";
 
-const RESGISTER = gql`
-  mutation ($username: String!, $email: String!, $password: String!) {
-    register(username: $username, email: $email, password: $password) {
+const LOGIN = gql`
+  mutation ($email: String!, $password: String!) {
+    login(email: $email, password: $password) {
+      token
+      refreshToken
       ok
       errors {
         path
@@ -21,31 +23,32 @@ const RESGISTER = gql`
     }
   }
 `;
-const Register = (props) => {
-  const [username, setUsername] = useState("");
+const Login = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [usernameError, setUsernameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const onSubmit = async (props) => {
+  const [onLogin, { data }] = useMutation(LOGIN);
+  const submit = () => {
     setPasswordError("");
-    setUsernameError("");
     setEmailError("");
-    onRegister({ variables: { username, email, password } });
+    try {
+      onLogin({ variables: { email, password } });
+    } catch (e) {
+      console.log(e);
+    }
   };
-  const [onRegister, { data }] = useMutation(RESGISTER);
 
   useEffect(() => {
     if (data) {
-      const { ok, errors } = data.register;
+      const { ok, token, refreshToken, errors } = data.login;
       if (ok) {
-        props.history.push("/");
+        localStorage.setItem("token", token);
+        localStorage.setItem("refreshToken", refreshToken);
+        props.history.push(`view-team`);
       } else {
         errors.forEach(({ path, message }) => {
-          if (path === "username") {
-            setUsernameError(message);
-          } else if (path === "email") {
+          if (path === "email") {
             setEmailError(message);
           } else {
             setPasswordError(message);
@@ -55,9 +58,6 @@ const Register = (props) => {
     }
   }, [data, props.history]);
   const errorList = [];
-  if (usernameError) {
-    errorList.push(usernameError);
-  }
   if (emailError) {
     errorList.push(emailError);
   }
@@ -66,17 +66,8 @@ const Register = (props) => {
   }
   return (
     <Container type="text">
-      <Header as="h2">Register</Header>
+      <Header as="h2">Login</Header>
       <Form>
-        <FormField error={!!usernameError}>
-          <Input
-            placeholder="username"
-            name="username"
-            value={username}
-            fluid
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </FormField>
         <FormField error={!!emailError}>
           <Input
             placeholder="email"
@@ -96,7 +87,7 @@ const Register = (props) => {
             onChange={({ target }) => setPassword(target.value)}
           />
         </FormField>
-        <Button onClick={onSubmit}>Submit</Button>
+        <Button onClick={submit}>Submit</Button>
       </Form>
       {errorList.length !== 0 ? (
         <Message
@@ -109,4 +100,4 @@ const Register = (props) => {
   );
 };
 
-export default Register;
+export default Login;

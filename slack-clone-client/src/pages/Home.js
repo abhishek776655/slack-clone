@@ -16,7 +16,7 @@ const Home = () => {
   if (loading) return "Loading...";
   if (error) return `Error! ${error}`;
   return (
-    <div>
+    <div className="p-4 m-4">
       {data.allUsers.map((item) => (
         <h1>{item.email}</h1>
       ))}

@@ -5,7 +5,7 @@ export default (sequelize, DataTypes) => {
       name: {
         type: DataTypes.STRING,
       },
-      public: DataTypes.BOOLEAN,
+      public: { type: DataTypes.BOOLEAN, defaultValue: true },
     },
     { undersocred: true }
   );

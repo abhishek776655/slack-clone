@@ -7,6 +7,9 @@ const message = gql`
     user: User!
     channel: Channel!
   }
+  type Subscription {
+    newChannelMessage(channelId: Int!): Message!
+  }
   type Mutation {
     createMessage(channelId: Int!, text: String!): Boolean!
   }
