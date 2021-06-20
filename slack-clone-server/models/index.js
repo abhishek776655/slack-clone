@@ -1,6 +1,6 @@
 import Sequelize from "sequelize";
 
-const sequelize = new Sequelize("slack", "postgres", "root", {
+const sequelize = new Sequelize("slack", "postgres", "getlost", {
   dialect: "postgres",
 });
 

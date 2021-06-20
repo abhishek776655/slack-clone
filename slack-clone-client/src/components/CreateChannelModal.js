@@ -125,7 +125,10 @@ export default function Modal(props) {
                   onSubmit={(values, { setSubmitting }) => {
                     console.log(values);
                     setError("");
-                    createChannelSubmit(values);
+                    createChannelSubmit(values).then((res) => {
+                      props.setShowModal(false);
+                    });
+
                     setSubmitting(false);
                   }}
                 >

@@ -8,6 +8,7 @@ import findIndex from "lodash/findIndex";
 import InvitePeopleModal from "../components/InvitePeopleModal";
 import Teams from "../components/Teams";
 import decode from "jwt-decode";
+import MessageContainer from "../components/MessageContainer";
 import { Redirect } from "react-router";
 const ViewTeam = ({ match: { params } }) => {
   const GET_TEAMS = gql`
@@ -105,8 +106,10 @@ const ViewTeam = ({ match: { params } }) => {
           teamId={team.id}
         />
         {channel && <ChannelHeader channelName={channel.name} />}
-        {channel && <div className="bg-gray-primary">Message</div>}
-        {channel && <SendMessage channelName={channel.name} />}
+        {channel && <MessageContainer channelId={channel.id} />}
+        {channel && (
+          <SendMessage channelName={channel.name} channelId={channel.id} />
+        )}
       </div>
     </div>
   );
