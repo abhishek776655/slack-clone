@@ -9,13 +9,21 @@ const schema = makeExecutableSchema({ typeDefs, resolvers });
 const SECRET = "rfdeskfpsgjkdjfglkdsj";
 const SECRET2 = "rfdeskfdsadsadsadsadd";
 const server = new ApolloServer({
+  subscriptions: {
+    path: "/subscriptions",
+  },
   schema,
-  context: ({ req }) => {
-    const token = req.headers.authorization || "";
-    console.log(token);
-    const user = getUser(token, SECRET);
+  context: ({ req, connection }) => {
+    if (connection) {
+      return connection.context;
+    } else {
+      const token = req.headers.authorization || "";
+      console.log(req.headers);
+      console.log("token");
+      const user = getUser(token, SECRET);
 
-    return { user, models, SECRET, SECRET2 };
+      return { user, models, SECRET, SECRET2 };
+    }
   },
 });
 

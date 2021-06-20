@@ -72,9 +72,9 @@ const ViewTeam = ({ match: { params } }) => {
     console.log(isOwner);
   } catch (e) {}
   return (
-    <div className="h-screen grid grid-cols-1 grid-rows-header">
+    <div className="h-screen grid grid-cols-1 grid-rows-header ">
       <div className="bg-purple-dark">header</div>
-      <div className="grid h-full grid-cols-layout grid-rows-layout">
+      <div className="grid h-full grid-cols-layout grid-rows-layout overflow-y-hidden">
         <Teams
           teams={teams.map((t) => ({
             id: t.id,
