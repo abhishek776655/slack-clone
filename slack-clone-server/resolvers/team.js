@@ -5,51 +5,29 @@ const formatErrors = (e) => {
 };
 
 export default {
-  Query: {
-    allTeams: requiresAuth.createResolver(
-      async (parent, args, { models, user }) => {
-        const userResponse = await models.Team.findAll(
-          { where: { owner: user.user.id } },
-          { raw: true }
-        );
-
-        return userResponse;
-      }
-    ),
-    inviteTeams: requiresAuth.createResolver(
-      async (parent, args, { models, user }) => {
-        const userResponse = await models.Team.findAll({
-          include: [
-            {
-              model: models.User,
-              where: {
-                id: user.user.id,
-              },
-              paranoid: false,
-            },
-          ],
-        });
-        return userResponse;
-      }
-    ),
-  },
   Mutation: {
     createTeam: requiresAuth.createResolver(
       async (parent, args, { models, user }) => {
         try {
           const Response = await models.sequelize.transaction(async () => {
             const team = await models.Team.create({
-              name: args.name,
-              owner: user.user.id,
+              ...args,
             });
+            console.log(team);
             await models.Channel.create({
               name: "general",
               public: true,
-              teamId: team.id,
+              teamId: team.dataValues.id,
             });
+
+            const member = await models.Member.create({
+              teamId: team.id,
+              userId: user.user.id,
+              admin: true,
+            });
+            console.log("member", member);
             return team;
           });
-          console.log(user.user.id);
 
           return {
             ok: true,
@@ -71,16 +49,16 @@ export default {
             { where: { email: email } },
             { raw: true }
           );
-          const teamPromise = models.Team.findOne(
-            { where: { id: teamId } },
+          const memberPromise = models.Member.findOne(
+            { where: { team_id: teamId, userId: user.user.id } },
             { raw: true }
           );
 
-          const [userToAdd, team] = await Promise.all([
+          const [userToAdd, member] = await Promise.all([
             userToAddPromise,
-            teamPromise,
+            memberPromise,
           ]);
-          if (team.owner !== user.user.id) {
+          if (!member.admin) {
             console.log(team);
             console.log(userToAdd);
 
@@ -97,7 +75,7 @@ export default {
               errors: [{ path: "email", message: "Invalid email" }],
             };
           }
-          const member = await models.Member.create({
+          const memberCreate = await models.Member.create({
             userId: userToAdd.id,
             teamId: teamId,
           });

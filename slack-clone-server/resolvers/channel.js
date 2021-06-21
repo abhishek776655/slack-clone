@@ -10,12 +10,12 @@ export default {
       async (parent, args, { models, user }) => {
         try {
           console.log(args);
-          const team = await models.Team.findOne(
-            { where: { id: args.teamId } },
+          const member = await models.Member.findOne(
+            { where: { teamId: args.teamId, userId: user.user.id } },
             { raw: true }
           );
-          console.log(team);
-          if (team.owner !== user.user.id) {
+
+          if (!member.admin) {
             return {
               ok: false,
               errors: [
@@ -28,12 +28,14 @@ export default {
           }
           const channel = await models.Channel.create(args);
           console.log(channel);
+          console.log("true");
           return {
             ok: true,
             channel,
           };
         } catch (e) {
           console.log(e);
+          console.log("false");
           return {
             ok: false,
             errors: formatErrors(e),

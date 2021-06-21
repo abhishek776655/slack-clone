@@ -1,20 +1,59 @@
 import bcrypt from "bcrypt";
 import _ from "lodash";
+import requiresAuth from "../permission";
 import { AuthenticationError } from "apollo-server";
 import { tryLogin } from "../auth";
 const formatErrors = (e) => {
   return e.errors.map((x) => _.pick(x, ["path", "message"]));
 };
 export default {
+  User: {
+    teams: (parent, args, { models, user }) =>
+      models.sequelize.query(
+        "select * from teams as team join members as member on team.id = member.team_id where member.user_id = ?",
+        {
+          replacements: [user.user.id],
+          model: models.Team,
+          raw: true,
+        }
+      ),
+  },
   Query: {
-    getUser: (parent, { id }, { models }) =>
-      models.User.findOne({ where: { id } }),
+    me: requiresAuth.createResolver(async (parent, args, { models, user }) =>
+      models.User.findOne({ where: { id: user.user.id } })
+    ),
     allUsers: (parent, args, { user, models }) => {
       if (!user) {
         throw new AuthenticationError("you must be logged in");
       }
       return models.User.findAll();
     },
+    allTeams: requiresAuth.createResolver(
+      async (parent, args, { models, user }) => {
+        const userResponse = await models.Team.findAll(
+          { where: { owner: user.user.id } },
+          { raw: true }
+        );
+
+        return userResponse;
+      }
+    ),
+    inviteTeams: requiresAuth.createResolver(
+      async (parent, args, { models, user }) => {
+        const userResponse = await models.Team.findAll({
+          include: [
+            {
+              model: models.User,
+              where: {
+                user_id: user.user.id,
+              },
+              paranoid: false,
+            },
+          ],
+        });
+        return userResponse;
+      }
+    ),
   },
   Mutation: {
     login: (parent, { email, password }, { models, SECRET, SECRET2 }) =>

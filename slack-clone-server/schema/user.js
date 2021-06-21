@@ -9,8 +9,10 @@ const user = gql`
   }
 
   type Query {
-    getUser(id: Int!): User!
+    me: User!
     allUsers: [User!]!
+    allTeams: [Team!]!
+    inviteTeams: [Team!]!
   }
   type RegisterResponse {
     ok: Boolean!

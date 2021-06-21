@@ -3,10 +3,10 @@ import { gql } from "apollo-server";
 const team = gql`
   type Team {
     id: Int!
-    owner: Int!
     name: String!
     members: [User!]!
     channels: [Channel!]!
+    admin: Boolean!
   }
   type CreateTeamResponse {
     ok: Boolean!
@@ -14,10 +14,6 @@ const team = gql`
     errors: [Error!]
   }
 
-  type Query {
-    allTeams: [Team!]!
-    inviteTeams: [Team!]!
-  }
   type VoidResponse {
     ok: Boolean!
     errors: [Error!]

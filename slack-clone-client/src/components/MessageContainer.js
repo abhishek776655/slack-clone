@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Comment } from "semantic-ui-react";
 const MESSAGES = gql`
   query ($channelId: Int!) {
@@ -30,8 +30,9 @@ const MESSAGES_SUBSCRIPTION = gql`
 const MessageContainer = ({ channelId }) => {
   const { subscribeToMore, data, loading, error } = useQuery(MESSAGES, {
     variables: { channelId: channelId },
+    fetchPolicy: "network-only",
   });
-  const subscribeToNewComments = () =>
+  const subscribeToNewComments = (channelId) =>
     subscribeToMore({
       document: MESSAGES_SUBSCRIPTION,
       variables: { channelId: channelId },
@@ -45,9 +46,16 @@ const MessageContainer = ({ channelId }) => {
         };
       },
     });
+
   useEffect(() => {
-    subscribeToNewComments();
-  }, []);
+    console.log("subscribe", channelId);
+    const unsubscribe = subscribeToNewComments(channelId);
+    return function cleanup() {
+      console.log("unsubscribe");
+      unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [channelId]);
 
   if (loading) return null;
   if (error) return `Error! ${error}`;

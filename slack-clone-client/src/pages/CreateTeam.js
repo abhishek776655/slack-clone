@@ -35,7 +35,7 @@ const CreateTeam = (props) => {
     try {
       await onCreateTeam({ variables: { name } });
     } catch (e) {
-      console.log(e.message);
+      console.log(e);
     }
   };
 

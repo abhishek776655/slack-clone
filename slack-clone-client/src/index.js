@@ -26,6 +26,9 @@ const wsLink = new WebSocketLink({
   uri: "ws://localhost:4000/subscriptions",
   options: {
     reconnect: true,
+    connectionParams: {
+      authToken: localStorage.getItem("token"),
+    },
   },
 });
 const splitLink = split(

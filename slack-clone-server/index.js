@@ -11,6 +11,18 @@ const SECRET2 = "rfdeskfdsadsadsadsadd";
 const server = new ApolloServer({
   subscriptions: {
     path: "/subscriptions",
+    onConnect: (connectionParams, webSocket) => {
+      if (connectionParams.authToken) {
+        const token = connectionParams.authToken;
+        const user = getUser(token);
+        if (user) {
+          return user;
+        }
+        throw new Error("invalid token");
+      }
+
+      throw new Error("Missing auth token!");
+    },
   },
   schema,
   context: ({ req, connection }) => {

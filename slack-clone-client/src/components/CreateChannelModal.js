@@ -9,6 +9,7 @@ const CREATE_CHANNEL = gql`
     createChannel(teamId: $teamId, name: $name) {
       ok
       channel {
+        id
         name
       }
       errors {
@@ -24,37 +25,53 @@ export default function Modal(props) {
   const [onCreateChannel, { data }] = useMutation(CREATE_CHANNEL, {
     update(cache, { data: { createChannel } }) {
       const { ok, channel } = createChannel;
+
       if (!ok) {
         return;
       }
+      console.log(channel);
       const data = cache.readQuery({
         query: gql`
           query {
-            allTeams {
+            me {
               id
-              name
-              channels {
+              email
+              username
+              teams {
                 id
                 name
+                admin
+                channels {
+                  id
+                  name
+                }
               }
             }
           }
         `,
       });
+      console.log(data);
 
-      const teamIdx = findIndex(data.allTeams, ["id", parseInt(props.teamId)]);
+      const teamIdx = findIndex(data.me.teams, ["id", parseInt(props.teamId)]);
       const Newdata = JSON.parse(JSON.stringify(data));
-      Newdata.allTeams[teamIdx].channels.push(channel);
+
+      Newdata.me.teams[teamIdx].channels.push(channel);
 
       cache.writeQuery({
         query: gql`
           query {
-            allTeams {
+            me {
               id
-              name
-              channels {
+              email
+              username
+              teams {
                 id
                 name
+                admin
+                channels {
+                  id
+                  name
+                }
               }
             }
           }
@@ -67,21 +84,22 @@ export default function Modal(props) {
   const [Error, setError] = useState("");
 
   const createChannelSubmit = async (values) => {
-    try {
-      console.log(values);
-      await onCreateChannel({
-        variables: { name: values.name, teamId: parseInt(props.teamId) },
+    return onCreateChannel({
+      variables: { name: values.name, teamId: parseInt(props.teamId) },
+    })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((e) => {
+        console.log(e.networkError);
+        setError(e.mesage);
       });
-    } catch (e) {
-      console.log(e);
-      setError(e.message);
-    }
   };
 
   useEffect(() => {
     if (data) {
       const { ok, errors } = data.createChannel;
-      console.log(data);
+
       if (ok) {
       } else {
         errors.forEach(({ path, message }) => {

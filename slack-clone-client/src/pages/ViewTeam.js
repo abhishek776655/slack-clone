@@ -11,31 +11,29 @@ import decode from "jwt-decode";
 import MessageContainer from "../components/MessageContainer";
 import { Redirect } from "react-router";
 const ViewTeam = ({ match: { params } }) => {
-  const GET_TEAMS = gql`
+  const ME_QUERY = gql`
     query {
-      allTeams {
+      me {
         id
-        name
-        owner
-        channels {
+        email
+        username
+        teams {
           id
           name
-        }
-      }
-      inviteTeams {
-        id
-        name
-        owner
-        channels {
-          id
-          name
+          admin
+          channels {
+            id
+            name
+          }
         }
       }
     }
   `;
   const [openModal, setOpenModal] = useState(false);
   const [openInviteModal, setOpenInviteModal] = useState(false);
-  const { loading, error, data } = useQuery(GET_TEAMS);
+  const { loading, error, data } = useQuery(ME_QUERY, {
+    fetchPolicy: "network-only",
+  });
   if (loading) {
     return null;
   }
@@ -43,9 +41,9 @@ const ViewTeam = ({ match: { params } }) => {
     console.log(error);
     return null;
   }
-  const teams = [...data.allTeams, ...data.inviteTeams];
+  const { teams } = data.me;
   console.log(data);
-  if (data.allTeams.length === 0) {
+  if (teams && teams.length === 0) {
     return <Redirect to="/createTeam" />;
   }
   const currentTeamId = params.teamId;
@@ -68,7 +66,7 @@ const ViewTeam = ({ match: { params } }) => {
     const token = localStorage.getItem("token");
     const { user } = decode(token);
     username = user.username;
-    isOwner = user.id === team.owner;
+    isOwner = team.admin;
     console.log(isOwner);
   } catch (e) {}
   return (

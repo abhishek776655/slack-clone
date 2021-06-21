@@ -27,6 +27,7 @@ export default function InvitePeopleModal(props) {
         variables: { email: values.email, teamId: parseInt(props.teamId) },
       });
     } catch (e) {
+      console.log(e);
       setError(e.message);
     }
   };
@@ -93,7 +94,6 @@ export default function InvitePeopleModal(props) {
                     isSubmitting,
                     /* and other goodies */
                   }) => (
-                    
                     <Form onSubmit={handleSubmit}>
                       <div className="relative p-6 flex-auto">
                         <FormField error={!!Error}>
