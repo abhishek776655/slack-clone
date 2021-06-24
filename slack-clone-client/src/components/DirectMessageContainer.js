@@ -2,60 +2,63 @@ import { gql, useQuery } from "@apollo/client";
 import React, { useEffect } from "react";
 import { Comment } from "semantic-ui-react";
 const MESSAGES = gql`
-  query ($channelId: Int!) {
-    messages(channelId: $channelId) {
+  query ($teamId: Int!, $otherUserId: Int!) {
+    directMessages(teamId: $teamId, otherUserId: $otherUserId) {
       id
-      text
-      user {
-        id
+      createdAt
+      sender {
         username
       }
-      createdAt
+      text
     }
   }
 `;
-const MESSAGES_SUBSCRIPTION = gql`
-  subscription ($channelId: Int!) {
-    newChannelMessage(channelId: $channelId) {
+const DIRECT_MESSAGES_SUBSCRIPTION = gql`
+  subscription ($teamId: Int!, $userId: Int!) {
+    newDirectMessage(teamId: $teamId, userId: $userId) {
       id
-      text
-      user {
-        id
+      createdAt
+      sender {
         username
       }
-      createdAt
+      text
     }
   }
 `;
-const MessageContainer = ({ channelId }) => {
+const DirectMessageContainer = ({ teamId, userId }) => {
+  console.log("userId,teamId", userId, teamId);
   const { subscribeToMore, data, loading, error } = useQuery(MESSAGES, {
-    variables: { channelId: channelId },
+    variables: { teamId, otherUserId: userId },
     fetchPolicy: "network-only",
   });
-  const subscribeToNewComments = (channelId) =>
-    subscribeToMore({
-      document: MESSAGES_SUBSCRIPTION,
-      variables: { channelId: channelId },
+  const subscribeToNewMessages = (teamId, userId) => {
+    console.log("teamId", teamId);
+    return subscribeToMore({
+      document: DIRECT_MESSAGES_SUBSCRIPTION,
+      variables: { userId, teamId },
       updateQuery: (prev, { subscriptionData }) => {
+        console.log(subscriptionData.data);
         if (!subscriptionData.data) return prev;
-        console.log(prev);
-        console.log(subscriptionData);
+
         return {
           ...prev,
-          messages: [...prev.messages, subscriptionData.data.newChannelMessage],
+          directMessages: [
+            ...prev.directMessages,
+            subscriptionData.data.newDirectMessage,
+          ],
         };
       },
     });
+  };
 
   useEffect(() => {
-    console.log("subscribe", channelId);
-    const unsubscribe = subscribeToNewComments(channelId);
+    const unsubscribe = subscribeToNewMessages(teamId, userId);
     return function cleanup() {
       console.log("unsubscribe");
       unsubscribe();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [channelId]);
+  }, [teamId, userId]);
 
   if (loading) return null;
   if (error) return `Error! ${error}`;
@@ -63,10 +66,10 @@ const MessageContainer = ({ channelId }) => {
   return (
     <div className="px-3 flex flex-col-reverse overflow-y-scroll max-h-full">
       <Comment.Group>
-        {data.messages.map((message) => (
+        {data.directMessages.map((message) => (
           <Comment key={message.id}>
             <Comment.Content>
-              <Comment.Author as="a">{message.user.username}</Comment.Author>
+              <Comment.Author as="a">{message.sender.username}</Comment.Author>
               <Comment.Metadata>
                 <div>{message.createdAt}</div>
               </Comment.Metadata>
@@ -81,4 +84,4 @@ const MessageContainer = ({ channelId }) => {
     </div>
   );
 };
-export default MessageContainer;
+export default DirectMessageContainer;

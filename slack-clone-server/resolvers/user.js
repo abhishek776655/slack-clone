@@ -19,6 +19,12 @@ export default {
       ),
   },
   Query: {
+    getUser: (parent, args, { user, models }) => {
+      if (!user) {
+        throw new AuthenticationError("you must be logged in");
+      }
+      return models.User.findOne({ where: { id: args.userId } });
+    },
     me: requiresAuth.createResolver(async (parent, args, { models, user }) =>
       models.User.findOne({ where: { id: user.user.id } })
     ),

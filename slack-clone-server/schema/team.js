@@ -5,6 +5,7 @@ const team = gql`
     id: Int!
     name: String!
     members: [User!]!
+    directMessageMembers: [User!]!
     channels: [Channel!]!
     admin: Boolean!
   }
@@ -12,6 +13,9 @@ const team = gql`
     ok: Boolean!
     team: Team
     errors: [Error!]
+  }
+  type Query {
+    getTeamMembers(teamId: Int!): [User!]!
   }
 
   type VoidResponse {

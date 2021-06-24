@@ -8,30 +8,34 @@ import { getUser } from "./auth";
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 const SECRET = "rfdeskfpsgjkdjfglkdsj";
 const SECRET2 = "rfdeskfdsadsadsadsadd";
+
 const server = new ApolloServer({
   subscriptions: {
     path: "/subscriptions",
     onConnect: (connectionParams, webSocket) => {
       if (connectionParams.authToken) {
         const token = connectionParams.authToken;
+        console.log("subscriptionToken", token);
         const user = getUser(token);
+
         if (user) {
-          return user;
+          console.log("user", user);
+          return { user, models };
         }
-        throw new Error("invalid token");
+        return { models };
       }
 
-      throw new Error("Missing auth token!");
+      return { models };
     },
   },
   schema,
   context: ({ req, connection }) => {
     if (connection) {
+      console.log("connection", connection.context);
       return connection.context;
     } else {
       const token = req.headers.authorization || "";
-      console.log(req.headers);
-      console.log("token");
+
       const user = getUser(token, SECRET);
 
       return { user, models, SECRET, SECRET2 };

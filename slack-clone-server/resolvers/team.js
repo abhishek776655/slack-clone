@@ -92,8 +92,37 @@ export default {
       }
     ),
   },
+
+  Query: {
+    getTeamMembers: requiresAuth.createResolver(
+      async (parent, args, { models, user }) => {
+        const users = await models.sequelize.query(
+          "select * from users as u join members as m on m.user_id = u.id where m.team_id = ?",
+          {
+            replacements: [args.teamId],
+            model: models.User,
+            raw: true,
+          }
+        );
+        console.warn(users);
+        return users;
+      }
+    ),
+  },
   Team: {
     channels: ({ id }, args, { models }) =>
       models.Channel.findAll({ where: { teamId: id } }),
+    directMessageMembers: async ({ id }, args, { models, user }) => {
+      const users = await models.sequelize.query(
+        "select distinct on (u.id) u.id ,u.username from users as u join direct_messages as dm on (u.id=dm.sender_id) or (u.id=dm.receiver_id) where (:currentUserId=dm.sender_id or :currentUserId=dm.receiver_id) and (dm.team_id=:currentTeamId) ",
+        {
+          replacements: { currentUserId: user.user.id, currentTeamId: id },
+          model: models.User,
+          raw: true,
+        }
+      );
+
+      return users;
+    },
   },
 };

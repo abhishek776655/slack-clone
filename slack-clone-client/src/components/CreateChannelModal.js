@@ -53,9 +53,9 @@ export default function Modal(props) {
       console.log(data);
 
       const teamIdx = findIndex(data.me.teams, ["id", parseInt(props.teamId)]);
-      const Newdata = JSON.parse(JSON.stringify(data));
+      const newData = JSON.parse(JSON.stringify(data));
 
-      Newdata.me.teams[teamIdx].channels.push(channel);
+      newData.me.teams[teamIdx].channels.push(channel);
 
       cache.writeQuery({
         query: gql`
@@ -76,7 +76,7 @@ export default function Modal(props) {
             }
           }
         `,
-        data: Newdata,
+        data: newData,
       });
     },
   });
@@ -92,7 +92,7 @@ export default function Modal(props) {
       })
       .catch((e) => {
         console.log(e.networkError);
-        setError(e.mesage);
+        setError(e.message);
       });
   };
 

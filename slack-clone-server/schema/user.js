@@ -10,6 +10,7 @@ const user = gql`
 
   type Query {
     me: User!
+    getUser(userId: Int!): User
     allUsers: [User!]!
     allTeams: [Team!]!
     inviteTeams: [Team!]!

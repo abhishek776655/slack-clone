@@ -13,13 +13,15 @@ const channel = ({ id, name }, teamId) => (
     </li>
   </Link>
 );
-const user = ({ id, name }) => (
-  <li
-    className="text-gray-primary text-base px-4 cursor-pointer hover:bg-gray-base"
-    key={`user-${id}`}
-  >
-    {name}
-  </li>
+const user = ({ id, username }, teamId) => (
+  <Link to={`/view-team/user/${teamId}/${id}`}>
+    <li
+      className="text-gray-primary text-base px-4 cursor-pointer hover:bg-gray-base"
+      key={`user-${id}`}
+    >
+      {username}
+    </li>
+  </Link>
 );
 const Channels = (props) => {
   console.log(props.teamName);
@@ -51,9 +53,10 @@ const Channels = (props) => {
           <Icon
             name="add"
             className="text-gray-primary cursor-pointer hover:text-white"
+            onClick={() => props.directMessageClick(true)}
           ></Icon>
         </div>
-        <div>{props.users.map(user)}</div>
+        <div>{props.users.map((u) => user(u, props.teamId))}</div>
         {props.isOwner && (
           <div>
             <a

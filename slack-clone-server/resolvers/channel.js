@@ -9,7 +9,6 @@ export default {
     createChannel: requiresAuth.createResolver(
       async (parent, args, { models, user }) => {
         try {
-          console.log(args);
           const member = await models.Member.findOne(
             { where: { teamId: args.teamId, userId: user.user.id } },
             { raw: true }
@@ -27,8 +26,7 @@ export default {
             };
           }
           const channel = await models.Channel.create(args);
-          console.log(channel);
-          console.log("true");
+
           return {
             ok: true,
             channel,

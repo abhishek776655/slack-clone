@@ -3,13 +3,7 @@ import { gql, useMutation } from "@apollo/client";
 import { Input, Form } from "semantic-ui-react";
 import { Formik } from "formik";
 
-const CREATE_MESSAGE = gql`
-  mutation ($message: String!, $channelId: Int!) {
-    createMessage(channelId: $channelId, text: $message)
-  }
-`;
-const SendMessage = ({ channelName, channelId }) => {
-  const [onCreateMessage] = useMutation(CREATE_MESSAGE);
+const SendMessage = ({ placeholder, onSubmit }) => {
   return (
     <div className="m-5">
       <Formik
@@ -47,16 +41,17 @@ const SendMessage = ({ channelName, channelId }) => {
                       return;
                     }
                     try {
-                      await onCreateMessage({
-                        variables: { channelId, message: values.message },
-                      });
+                      // await onCreateMessage({
+                      //   variables: { channelId, message: values.message },
+                      // });
+                      await onSubmit(values.message);
                       resetForm();
                     } catch (e) {
-                      console.log(e);
+                      console.log(e.message);
                     }
                   }
                 }}
-                placeholder={`Message # ${channelName}`}
+                placeholder={`Message # ${placeholder}`}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 name="message"

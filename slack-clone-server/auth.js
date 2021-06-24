@@ -94,7 +94,6 @@ export const tryLogin = async (email, password, models, SECRET, SECRET2) => {
 };
 
 export const getUser = (token, SECRET) => {
-  console.log("token", token);
   let user = null;
   if (token) {
     user = jwt.decode(token, SECRET);

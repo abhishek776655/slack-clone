@@ -1,18 +1,20 @@
 const { PubSub, withFilter } = require("apollo-server");
-import requireAuth from "../permission";
+import requireAuth, { requireControlAction } from "../permission";
 const pubsub = new PubSub();
 
 const NEW_CHANNEL_MESSAGE = "NEW_CHANNEL_MESSAGE";
 export default {
   Subscription: {
     newChannelMessage: {
-      subscribe: withFilter(
-        () => pubsub.asyncIterator(NEW_CHANNEL_MESSAGE),
-        (payload, args) => {
-          // Only push an update if the comment is on
-          // the correct repository for this operation
-          return payload.channelId === args.channelId;
-        }
+      subscribe: requireControlAction.createResolver(
+        withFilter(
+          () => pubsub.asyncIterator(NEW_CHANNEL_MESSAGE),
+          (payload, args) => {
+            // Only push an update if the comment is on
+            // the correct repository for this operation
+            return payload.channelId === args.channelId;
+          }
+        )
       ),
     },
   },
@@ -44,7 +46,6 @@ export default {
   Mutation: {
     createMessage: requireAuth.createResolver(
       async (parents, args, { models, user }, info) => {
-        console.log(args);
         try {
           const messages = await models.Message.create({
             ...args,
