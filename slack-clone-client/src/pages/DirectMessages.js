@@ -1,19 +1,15 @@
-import React, { useState } from "react";
-import CreateChannelModal from "../components/CreateChannelModal";
+import React from "react";
 import SendMessage from "../components/SendMessage";
 import ChannelHeader from "../components/ChannelHeader";
 import { gql, useQuery, useMutation } from "@apollo/client";
-import Channels from "../components/Channels";
 import findIndex from "lodash/findIndex";
-import InvitePeopleModal from "../components/InvitePeopleModal";
-import Teams from "../components/Teams";
+import Sidebar from "../containers/Sidebar";
 import decode from "jwt-decode";
-import DirectMessageContainer from "../components/DirectMessageContainer";
+import DirectMessageContainer from "../containers/DirectMessageContainer";
 import { Redirect } from "react-router";
-import DirectMessageModal from "../components/DirectMessageModal";
 
 const CREATE_DIRECT_MESSAGE = gql`
-  mutation ($receiverId: Int!, $text: String!, $teamId: Int!) {
+  mutation ($receiverId: Int!, $text: String, $teamId: Int!) {
     createDirectMessage(receiverId: $receiverId, text: $text, teamId: $teamId)
   }
 `;
@@ -44,10 +40,17 @@ const DIRECT_MESSAGE_ME_QUERY = gql`
   }
 `;
 const DirectMessages = ({ match: { params } }) => {
+  const otherUserId = parseInt(params.userId);
+
+  // const otherUserIdInteger = parseInt(
+  //   JSON.parse(JSON.stringify(otherUserId)),
+  //   10
+  // );
   const { loading, error, data } = useQuery(DIRECT_MESSAGE_ME_QUERY, {
-    fetchPolicy: "network-only",
+    //causing Re unnecessary re rendering
+    // fetchPolicy: "network-only",
     variables: {
-      userId: parseInt(params.userId, 10),
+      userId: otherUserId,
     },
   });
   const [onCreateDirectMessage] = useMutation(CREATE_DIRECT_MESSAGE, {
@@ -116,11 +119,6 @@ const DirectMessages = ({ match: { params } }) => {
       });
     },
   });
-
-  const [openModal, setOpenModal] = useState(false);
-  const [openInviteModal, setOpenInviteModal] = useState(false);
-  const [openDirectMessageModal, setOpenDirectMessageModal] = useState(false);
-
   if (loading) {
     return null;
   }
@@ -132,8 +130,10 @@ const DirectMessages = ({ match: { params } }) => {
   if (teams && teams.length === 0) {
     return <Redirect to="/createTeam" />;
   }
-  const currentTeamId = parseInt(params.teamId);
-  const userId = parseInt(params.userId);
+  const currentTeamId = params.teamId;
+  const userId = params.userId;
+  const userIdInt = parseInt(userId);
+
   const currentTeamIdInteger = parseInt(currentTeamId);
   let teamIdx = !!currentTeamIdInteger
     ? findIndex(teams, ["id", parseInt(currentTeamIdInteger, 10)])
@@ -152,64 +152,44 @@ const DirectMessages = ({ match: { params } }) => {
     isOwner = team.admin;
     console.log(isOwner);
   } catch (e) {}
-  console.log("user", userId);
+
   return (
     <div className="h-screen grid grid-cols-1 grid-rows-header ">
       <div className="bg-purple-dark">header</div>
-      <div className="grid h-full grid-cols-layout grid-rows-layout overflow-y-hidden">
-        <Teams
+      <div className="grid h-full grid-cols-layout overflow-y-hidden">
+        <Sidebar
           teams={teams.map((t) => ({
             id: t.id,
             letter: t.name.charAt(0).toUpperCase(),
           }))}
-        />
-
-        <Channels
-          teamName={team.name}
-          isOwner={isOwner}
+          team={team}
           username={username}
-          channels={team.channels}
-          users={team.directMessageMembers}
-          setOpenModal={setOpenModal}
-          setOpenInviteModal={setOpenInviteModal}
-          directMessageClick={setOpenDirectMessageModal}
-          teamId={team.id}
         />
-        <CreateChannelModal
-          showModal={openModal}
-          setShowModal={setOpenModal}
-          teamId={team.id}
-        />
-        <InvitePeopleModal
-          setOpenInviteModal={setOpenInviteModal}
-          openInviteModal={openInviteModal}
-          teamId={team.id}
-        />
-        <DirectMessageModal
-          showModal={openDirectMessageModal}
-          setShowModal={setOpenDirectMessageModal}
-          teamId={team.id}
-        />
-        <ChannelHeader channelName={data.getUser.username} />
-        <DirectMessageContainer teamId={team.id} userId={userId} />
-        {
-          <SendMessage
-            placeHolder={userId}
-            onSubmit={async (text) => {
-              console.log("currentTeam", currentTeamId);
-              await onCreateDirectMessage({
-                variables: {
-                  text: text,
-                  receiverId: userId,
-                  teamId: currentTeamId,
-                },
-              });
-            }}
-          />
-        }
+        <div className="grid grid-rows-layout">
+          <ChannelHeader channelName={data.getUser.username} />
+          <DirectMessageContainer teamId={team.id} userId={userIdInt} />
+          {
+            <SendMessage
+              placeHolder={userIdInt}
+              isDirectMessage={true}
+              userId={userIdInt}
+              teamId={team.id}
+              onSubmit={async (text) => {
+                await onCreateDirectMessage({
+                  variables: {
+                    text: text,
+                    receiverId: userIdInt,
+                    teamId: currentTeamIdInteger,
+                  },
+                });
+              }}
+            />
+          }
+        </div>
       </div>
     </div>
   );
 };
 
 export default DirectMessages;
+DirectMessages.whyDidYouRender = true;

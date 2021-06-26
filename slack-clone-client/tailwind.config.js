@@ -9,7 +9,9 @@ module.exports = {
         16: "repeat(16, minmax(0, 1fr))",
 
         // Complex site-specific column configuration
-        layout: "100px 250px 1fr",
+        layout: "350px 1fr",
+        sendMessageGrid: "5% 95%",
+        sidebar: "100px 250px",
       },
       gridTemplateRows: {
         layout: "auto 1fr auto",

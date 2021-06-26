@@ -40,7 +40,7 @@ const Register = (props) => {
     if (data) {
       const { ok, errors } = data.register;
       if (ok) {
-        props.history.push("/");
+        props.history.push("/login");
       } else {
         errors.forEach(({ path, message }) => {
           if (path === "username") {

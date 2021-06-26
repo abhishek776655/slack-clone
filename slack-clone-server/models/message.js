@@ -5,6 +5,8 @@ export default (sequelize, DataTypes) => {
       text: {
         type: DataTypes.STRING,
       },
+      url: DataTypes.STRING,
+      filetype: DataTypes.STRING,
     },
     { underscored: true }
   );

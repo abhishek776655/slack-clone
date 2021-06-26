@@ -1,19 +1,15 @@
-import React, { useState } from "react";
-import CreateChannelModal from "../components/CreateChannelModal";
+import React from "react";
 import SendMessage from "../components/SendMessage";
 import ChannelHeader from "../components/ChannelHeader";
 import { gql, useQuery, useMutation } from "@apollo/client";
-import Channels from "../components/Channels";
 import findIndex from "lodash/findIndex";
-import InvitePeopleModal from "../components/InvitePeopleModal";
-import Teams from "../components/Teams";
+import Sidebar from "../containers/Sidebar";
 import decode from "jwt-decode";
-import MessageContainer from "../components/MessageContainer";
+import MessageContainer from "../containers/MessageContainer";
 import { Redirect } from "react-router";
-import DirectMessageModal from "../components/DirectMessageModal";
 
 const CREATE_MESSAGE = gql`
-  mutation ($message: String!, $channelId: Int!) {
+  mutation ($message: String, $channelId: Int!) {
     createMessage(channelId: $channelId, text: $message)
   }
 `;
@@ -42,11 +38,6 @@ const ME_QUERY = gql`
 
 const ViewTeam = ({ match: { params } }) => {
   const [onCreateMessage] = useMutation(CREATE_MESSAGE);
-
-  const [openModal, setOpenModal] = useState(false);
-  const [openInviteModal, setOpenInviteModal] = useState(false);
-  const [openDirectMessageModal, setOpenDirectMessageModal] = useState(false);
-
   const { loading, error, data } = useQuery(ME_QUERY, {
     fetchPolicy: "network-only",
   });
@@ -95,54 +86,36 @@ const ViewTeam = ({ match: { params } }) => {
   return (
     <div className="h-screen grid grid-cols-1 grid-rows-header ">
       <div className="bg-purple-dark">header</div>
-      <div className="grid h-full grid-cols-layout grid-rows-layout overflow-y-hidden">
-        <Teams
+      <div className="grid h-full grid-cols-layout overflow-y-hidden">
+        <Sidebar
           teams={teams.map((t) => ({
             id: t.id,
             letter: t.name.charAt(0).toUpperCase(),
           }))}
-        />
-
-        <Channels
-          teamName={team.name}
-          isOwner={isOwner}
+          team={team}
           username={username}
-          channels={team.channels}
-          users={team.directMessageMembers}
-          setOpenModal={setOpenModal}
-          setOpenInviteModal={setOpenInviteModal}
-          teamId={team.id}
-          directMessageClick={setOpenDirectMessageModal}
         />
-        <CreateChannelModal
-          showModal={openModal}
-          setShowModal={setOpenModal}
-          teamId={team.id}
-        />
-        <DirectMessageModal
-          showModal={openDirectMessageModal}
-          setShowModal={setOpenDirectMessageModal}
-          teamId={team.id}
-        />
-        <InvitePeopleModal
-          setOpenInviteModal={setOpenInviteModal}
-          openInviteModal={openInviteModal}
-          teamId={team.id}
-        />
-        {channel && <ChannelHeader channelName={channel.name} />}
-        {channel && <MessageContainer channelId={channel.id} />}
-        {channel && (
-          <SendMessage
-            placeholder={channel.name}
-            onSubmit={async (text) => {
-              console.log(text);
-              console.log(channel.id);
-              await onCreateMessage({
-                variables: { channelId: channel.id, message: text },
-              });
-            }}
-          />
-        )}
+        <div className="grid grid-rows-layout">
+          {channel && <ChannelHeader channelName={channel.name} />}
+          {channel && <MessageContainer channelId={channel.id} />}
+          {channel && (
+            <SendMessage
+              isDirectMessage={false}
+              channelId={channel.id}
+              placeholder={channel.name}
+              onSubmit={async (text) => {
+                console.log(text);
+
+                await onCreateMessage({
+                  variables: {
+                    channelId: channel.id,
+                    message: text,
+                  },
+                });
+              }}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

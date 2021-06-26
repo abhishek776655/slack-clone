@@ -45,7 +45,7 @@ const Login = (props) => {
       if (ok) {
         localStorage.setItem("token", token);
         localStorage.setItem("refreshToken", refreshToken);
-        props.history.push(`view-team`);
+        props.history.push("/view-team");
       } else {
         errors.forEach(({ path, message }) => {
           if (path === "email") {

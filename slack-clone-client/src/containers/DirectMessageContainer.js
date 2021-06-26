@@ -1,11 +1,15 @@
 import { gql, useQuery } from "@apollo/client";
 import React, { useEffect } from "react";
+import Dropzone from "react-dropzone";
 import { Comment } from "semantic-ui-react";
+
 const MESSAGES = gql`
   query ($teamId: Int!, $otherUserId: Int!) {
     directMessages(teamId: $teamId, otherUserId: $otherUserId) {
       id
       createdAt
+      url
+      filetype
       sender {
         username
       }
@@ -17,7 +21,10 @@ const DIRECT_MESSAGES_SUBSCRIPTION = gql`
   subscription ($teamId: Int!, $userId: Int!) {
     newDirectMessage(teamId: $teamId, userId: $userId) {
       id
+
       createdAt
+      url
+      filetype
       sender {
         username
       }
@@ -65,22 +72,31 @@ const DirectMessageContainer = ({ teamId, userId }) => {
   console.log(data);
   return (
     <div className="px-3 flex flex-col-reverse overflow-y-scroll max-h-full">
-      <Comment.Group>
-        {data.directMessages.map((message) => (
-          <Comment key={message.id}>
-            <Comment.Content>
-              <Comment.Author as="a">{message.sender.username}</Comment.Author>
-              <Comment.Metadata>
-                <div>{message.createdAt}</div>
-              </Comment.Metadata>
-              <Comment.Text>{message.text}</Comment.Text>
-              <Comment.Actions>
-                <Comment.Action>Reply</Comment.Action>
-              </Comment.Actions>
-            </Comment.Content>
-          </Comment>
-        ))}
-      </Comment.Group>
+      <Dropzone onDrop={(files) => console.log(files)}>
+        {({ getRootProps, getInputProps }) => (
+          <div className="container">
+            <input {...getInputProps()} />
+            <Comment.Group>
+              {data.directMessages.map((message) => (
+                <Comment key={message.id}>
+                  <Comment.Content>
+                    <Comment.Author as="a">
+                      {message.sender.username}
+                    </Comment.Author>
+                    <Comment.Metadata>
+                      <div>{message.createdAt}</div>
+                    </Comment.Metadata>
+                    <Comment.Text>{message.text}</Comment.Text>
+                    <Comment.Actions>
+                      <Comment.Action>Reply</Comment.Action>
+                    </Comment.Actions>
+                  </Comment.Content>
+                </Comment>
+              ))}
+            </Comment.Group>
+          </div>
+        )}
+      </Dropzone>
     </div>
   );
 };

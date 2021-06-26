@@ -14359,7 +14359,15 @@ video {
 }
 
 .grid-cols-layout {
-  grid-template-columns: 100px 250px 1fr;
+  grid-template-columns: 350px 1fr;
+}
+
+.grid-cols-sendMessageGrid {
+  grid-template-columns: 5% 95%;
+}
+
+.grid-cols-sidebar {
+  grid-template-columns: 100px 250px;
 }
 
 .auto-cols-auto {
@@ -32247,7 +32255,15 @@ video {
   }
 
   .sm\:grid-cols-layout {
-    grid-template-columns: 100px 250px 1fr;
+    grid-template-columns: 350px 1fr;
+  }
+
+  .sm\:grid-cols-sendMessageGrid {
+    grid-template-columns: 5% 95%;
+  }
+
+  .sm\:grid-cols-sidebar {
+    grid-template-columns: 100px 250px;
   }
 
   .sm\:auto-cols-auto {
@@ -50013,7 +50029,15 @@ video {
   }
 
   .md\:grid-cols-layout {
-    grid-template-columns: 100px 250px 1fr;
+    grid-template-columns: 350px 1fr;
+  }
+
+  .md\:grid-cols-sendMessageGrid {
+    grid-template-columns: 5% 95%;
+  }
+
+  .md\:grid-cols-sidebar {
+    grid-template-columns: 100px 250px;
   }
 
   .md\:auto-cols-auto {
@@ -67779,7 +67803,15 @@ video {
   }
 
   .lg\:grid-cols-layout {
-    grid-template-columns: 100px 250px 1fr;
+    grid-template-columns: 350px 1fr;
+  }
+
+  .lg\:grid-cols-sendMessageGrid {
+    grid-template-columns: 5% 95%;
+  }
+
+  .lg\:grid-cols-sidebar {
+    grid-template-columns: 100px 250px;
   }
 
   .lg\:auto-cols-auto {
@@ -85545,7 +85577,15 @@ video {
   }
 
   .xl\:grid-cols-layout {
-    grid-template-columns: 100px 250px 1fr;
+    grid-template-columns: 350px 1fr;
+  }
+
+  .xl\:grid-cols-sendMessageGrid {
+    grid-template-columns: 5% 95%;
+  }
+
+  .xl\:grid-cols-sidebar {
+    grid-template-columns: 100px 250px;
   }
 
   .xl\:auto-cols-auto {
@@ -103311,7 +103351,15 @@ video {
   }
 
   .\32xl\:grid-cols-layout {
-    grid-template-columns: 100px 250px 1fr;
+    grid-template-columns: 350px 1fr;
+  }
+
+  .\32xl\:grid-cols-sendMessageGrid {
+    grid-template-columns: 5% 95%;
+  }
+
+  .\32xl\:grid-cols-sidebar {
+    grid-template-columns: 100px 250px;
   }
 
   .\32xl\:auto-cols-auto {

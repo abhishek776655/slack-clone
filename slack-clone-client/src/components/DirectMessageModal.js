@@ -16,7 +16,7 @@ const GET_TEAM_MEMBER = gql`
 `;
 export default function DirectMessageModal(props) {
   let history = useHistory();
-  const { data, loading, error } = useQuery(GET_TEAM_MEMBER, {
+  const { data, error } = useQuery(GET_TEAM_MEMBER, {
     variables: {
       teamId: props.teamId,
     },
@@ -64,6 +64,7 @@ export default function DirectMessageModal(props) {
                         freeSolo
                         onChange={(event, value) => {
                           if (value) {
+                            props.setShowModal(false);
                             return history.push(
                               `/view-team/user/${props.teamId}/${value.id}`
                             );

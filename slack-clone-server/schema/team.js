@@ -21,6 +21,7 @@ const team = gql`
   type VoidResponse {
     ok: Boolean!
     errors: [Error!]
+    user: User
   }
   type Mutation {
     createTeam(name: String!): CreateTeamResponse!

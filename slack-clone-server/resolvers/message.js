@@ -1,7 +1,6 @@
 const { PubSub, withFilter } = require("apollo-server");
 import requireAuth, { requireControlAction } from "../permission";
 const pubsub = new PubSub();
-
 const NEW_CHANNEL_MESSAGE = "NEW_CHANNEL_MESSAGE";
 export default {
   Subscription: {
@@ -21,8 +20,6 @@ export default {
   Query: {
     messages: requireAuth.createResolver(
       async (parents, args, { models, user }, info) => {
-        console.log(args.channelId);
-
         try {
           const message = await models.Message.findAll(
             {
@@ -33,7 +30,7 @@ export default {
             },
             { raw: true }
           );
-          console.log(message);
+
           return message;
         } catch (e) {
           console.log(e);
@@ -46,6 +43,7 @@ export default {
   Mutation: {
     createMessage: requireAuth.createResolver(
       async (parents, args, { models, user }, info) => {
+        console.log(args);
         try {
           const messages = await models.Message.create({
             ...args,

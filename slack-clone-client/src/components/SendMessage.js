@@ -1,11 +1,19 @@
-import React from "react";
-import { gql, useMutation } from "@apollo/client";
+import React, { useState } from "react";
 import { Input, Form } from "semantic-ui-react";
 import { Formik } from "formik";
+import FileUploadChannels from "./FileUploadChannels";
+import FileUploadDirectMessage from "./FileUploadDirectMessage";
 
-const SendMessage = ({ placeholder, onSubmit }) => {
+const SendMessage = ({
+  placeholder,
+  onSubmit,
+  channelId,
+  isDirectMessage,
+  teamId,
+  userId,
+}) => {
   return (
-    <div className="m-5">
+    <div className="m-2">
       <Formik
         initialValues={{ message: "" }}
         validate={(values) => {
@@ -27,23 +35,24 @@ const SendMessage = ({ placeholder, onSubmit }) => {
           /* and other goodies */
         }) => (
           <Form>
-            <div className="relative flex-auto">
+            <div className="relative flex-auto grid grid-cols-sendMessageGrid">
+              {isDirectMessage ? (
+                <FileUploadDirectMessage
+                  teamId={teamId}
+                  userId={userId}
+                ></FileUploadDirectMessage>
+              ) : (
+                <FileUploadChannels channelId={channelId}></FileUploadChannels>
+              )}
+
               <Input
-                fluid
                 onKeyDown={async (e) => {
-                  console.log(e);
                   if (e.key === "Enter") {
-                    console.log("enter");
-                    console.log(values);
                     if (!values.message || !values.message.trim()) {
                       setSubmitting(false);
-                      console.log(values);
                       return;
                     }
                     try {
-                      // await onCreateMessage({
-                      //   variables: { channelId, message: values.message },
-                      // });
                       await onSubmit(values.message);
                       resetForm();
                     } catch (e) {

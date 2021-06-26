@@ -11,12 +11,58 @@ const INIVITE_PEOPLE = gql`
         path
         message
       }
+      user {
+        id
+        username
+        email
+      }
     }
   }
 `;
 
 export default function InvitePeopleModal(props) {
-  const [onInviteMember, { data }] = useMutation(INIVITE_PEOPLE);
+  const [onInviteMember, { data }] = useMutation(INIVITE_PEOPLE, {
+    update(cache, { data: { inviteMember } }) {
+      const { ok, user } = inviteMember;
+      if (!ok) {
+        return;
+      }
+      const data = cache.readQuery({
+        query: gql`
+          query ($teamId: Int!) {
+            getTeamMembers(teamId: $teamId) {
+              id
+              username
+              email
+            }
+          }
+        `,
+        variables: {
+          teamId: parseInt(props.teamId),
+        },
+      });
+
+      const newData = JSON.parse(JSON.stringify(data));
+      newData.getTeamMembers.push(user);
+      console.log(newData);
+
+      cache.writeQuery({
+        query: gql`
+          query ($teamId: Int!) {
+            getTeamMembers(teamId: $teamId) {
+              id
+              username
+              email
+            }
+          }
+        `,
+        variables: {
+          teamId: parseInt(props.teamId),
+        },
+        data: newData,
+      });
+    },
+  });
 
   const [Error, setError] = useState("");
 

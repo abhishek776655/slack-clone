@@ -6,6 +6,8 @@ const MESSAGES = gql`
     messages(channelId: $channelId) {
       id
       text
+      url
+      filetype
       user {
         id
         username
@@ -19,6 +21,8 @@ const MESSAGES_SUBSCRIPTION = gql`
     newChannelMessage(channelId: $channelId) {
       id
       text
+      url
+      filetype
       user {
         id
         username

@@ -1,6 +1,5 @@
 import { ApolloServer, makeExecutableSchema } from "apollo-server";
 import resolvers from "./resolvers";
-
 import models from "./models";
 import typeDefs from "./schema";
 import { getUser } from "./auth";
