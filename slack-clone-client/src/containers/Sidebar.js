@@ -45,3 +45,4 @@ const Sidebar = (props) => {
 };
 
 export default Sidebar;
+Sidebar.whyDidYouRender = true;

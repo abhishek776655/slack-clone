@@ -14,6 +14,10 @@ const models = {
     sequelize,
     Sequelize.DataTypes
   ),
+  PCMember: require("./privateChannelMembers").default(
+    sequelize,
+    Sequelize.DataTypes
+  ),
 };
 
 Object.keys(models).forEach((modelName) => {

@@ -1,12 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button, FormField, Form } from "semantic-ui-react";
+
+import { TextField, Button } from "@material-ui/core";
 import { Formik, ErrorMessage } from "formik";
 import { gql, useMutation } from "@apollo/client";
 import findIndex from "lodash/findIndex";
+import { Checkbox, FormGroup, FormControlLabel } from "@material-ui/core";
+import MultiSelectUser from "./MultiSelectUser";
 
 const CREATE_CHANNEL = gql`
-  mutation ($teamId: Int!, $name: String!) {
-    createChannel(teamId: $teamId, name: $name) {
+  mutation ($teamId: Int!, $name: String!, $public: Boolean, $members: [Int!]) {
+    createChannel(
+      teamId: $teamId
+      name: $name
+      public: $public
+      members: $members
+    ) {
       ok
       channel {
         id
@@ -85,13 +93,20 @@ export default function Modal(props) {
 
   const createChannelSubmit = async (values) => {
     return onCreateChannel({
-      variables: { name: values.name, teamId: parseInt(props.teamId) },
+      variables: {
+        name: values.name,
+        teamId: parseInt(props.teamId),
+        public: values.public,
+        members: values.members.map((m) => m.id),
+      },
     })
       .then((res) => {
-        console.log(res);
+        setError("");
+        props.setShowModal(false);
       })
       .catch((e) => {
         console.log(e.networkError);
+        // props.setShowModal(false);
         setError(e.message);
       });
   };
@@ -109,7 +124,7 @@ export default function Modal(props) {
     }
   }, [data, props]);
 
-  console.log(props.showModal);
+  console.log(Error);
   return (
     <>
       {props.showModal ? (
@@ -123,7 +138,7 @@ export default function Modal(props) {
                   <h3 className="text-xl font-semibold">Add Channel</h3>
                   <button
                     className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
-                    onClick={() => props.setShowModal(false)}
+                    // onClick={() => props.setShowModal(false)}
                   >
                     <span className="opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
                       X
@@ -132,7 +147,7 @@ export default function Modal(props) {
                 </div>
                 {/*body*/}
                 <Formik
-                  initialValues={{ name: "" }}
+                  initialValues={{ name: "", public: true, members: [] }}
                   validate={(values) => {
                     const errors = {};
                     if (!values.name) {
@@ -140,13 +155,10 @@ export default function Modal(props) {
                     }
                     return errors;
                   }}
-                  onSubmit={(values, { setSubmitting }) => {
+                  onSubmit={async (values, { resetForm, setSubmitting }) => {
                     console.log(values);
                     setError("");
-                    createChannelSubmit(values).then((res) => {
-                      props.setShowModal(false);
-                    });
-
+                    createChannelSubmit(values);
                     setSubmitting(false);
                   }}
                 >
@@ -158,20 +170,56 @@ export default function Modal(props) {
                     handleBlur,
                     handleSubmit,
                     isSubmitting,
+                    setFieldValue,
+                    resetForm,
                     /* and other goodies */
                   }) => (
-                    <Form onSubmit={handleSubmit}>
-                      <div className="relative p-6 flex-auto">
-                        <FormField error={!!Error}>
-                          <Input
-                            className="w-full"
-                            fluid
+                    <form onSubmit={handleSubmit}>
+                      <div className="relative p-8 flex-auto">
+                        {console.log(values)}
+                        <FormGroup>
+                          <TextField
+                            error={Error > 0 ? true : false}
+                            id="outlined-basic"
+                            label="Channel Name"
+                            variant="outlined"
+                            fullWidth
                             onChange={handleChange}
                             onBlur={handleBlur}
                             name="name"
                             value={values.name}
                           />
-                        </FormField>
+
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                value={!values.public}
+                                color="primary"
+                                aria-label="Private"
+                                onChange={(e) =>
+                                  setFieldValue("public", !e.target.checked)
+                                }
+                                inputProps={{
+                                  "aria-label": "secondary checkbox",
+                                }}
+                              />
+                            }
+                            label="Private"
+                          />
+                          {!values.public ? (
+                            <MultiSelectUser
+                              teamId={parseInt(props.teamId)}
+                              className="mt-4"
+                              placeholder="Search Team members"
+                              label="Team Members"
+                              value={values.member}
+                              handleChange={(e, value) => {
+                                console.log(e.target);
+                                setFieldValue("members", value);
+                              }}
+                            />
+                          ) : null}
+                        </FormGroup>
                         <ErrorMessage
                           className="my-2"
                           name="name"
@@ -180,22 +228,28 @@ export default function Modal(props) {
                         {Error}
                       </div>
                       {/*footer*/}
-                      <div className="flex items-center justify-end p-6  border-blueGray-200 rounded-b">
-                        <Button type="submit" disabled={isSubmitting} fluid>
+                      <div className="flex items-center w-full p-6  border-blueGray-200 rounded-b">
+                        <Button
+                          type="submit"
+                          color="primary"
+                          disabled={isSubmitting}
+                          fullWidth
+                        >
                           Create Channel
                         </Button>
                         <Button
                           disabled={isSubmitting}
+                          color="primary"
                           onClick={() => {
                             setError("");
                             props.setShowModal(false);
                           }}
-                          fluid
+                          fullWidth
                         >
                           Cancel
                         </Button>
                       </div>
-                    </Form>
+                    </form>
                   )}
                 </Formik>
               </div>

@@ -3,22 +3,16 @@ import { Icon } from "semantic-ui-react";
 import { Link } from "react-router-dom";
 
 const channel = ({ id, name }, teamId) => (
-  <Link to={`/view-team/${teamId}/${id}`}>
+  <Link to={`/view-team/${teamId}/${id}`} key={`channel-${id}`}>
     {" "}
-    <li
-      className="text-lg text-gray-primary px-4 cursor-pointer hover:bg-gray-base"
-      key={`channel-${id}`}
-    >
+    <li className="text-lg text-gray-primary px-4 cursor-pointer hover:bg-gray-base">
       # {name}
     </li>
   </Link>
 );
 const user = ({ id, username }, teamId) => (
-  <Link to={`/view-team/user/${teamId}/${id}`}>
-    <li
-      className="text-gray-primary text-base px-4 cursor-pointer hover:bg-gray-base"
-      key={`user-${id}`}
-    >
+  <Link to={`/view-team/user/${teamId}/${id}`} key={`user-${id}`}>
+    <li className="text-gray-primary text-base px-4 cursor-pointer hover:bg-gray-base">
       {username}
     </li>
   </Link>
@@ -73,3 +67,4 @@ const Channels = (props) => {
 };
 
 export default Channels;
+Channels.whyDidYouRender = true;

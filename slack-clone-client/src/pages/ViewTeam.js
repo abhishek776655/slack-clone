@@ -39,7 +39,7 @@ const ME_QUERY = gql`
 const ViewTeam = ({ match: { params } }) => {
   const [onCreateMessage] = useMutation(CREATE_MESSAGE);
   const { loading, error, data } = useQuery(ME_QUERY, {
-    fetchPolicy: "network-only",
+    // fetchPolicy: "network-only",
   });
   if (loading) {
     return null;
@@ -59,7 +59,7 @@ const ViewTeam = ({ match: { params } }) => {
   let teamIdx = currentTeamIdInteger
     ? findIndex(teams, ["id", parseInt(currentTeamIdInteger, 10)])
     : 0;
-  console.warn(teamIdx);
+
   if (teamIdx === -1) {
     teamIdx = 0;
   }

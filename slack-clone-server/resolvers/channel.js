@@ -1,4 +1,3 @@
-import { UserInputError } from "apollo-server-errors";
 import requiresAuth from "../permission";
 
 const formatErrors = (e) => {
@@ -25,7 +24,21 @@ export default {
               ],
             };
           }
+          console.log(args);
+          // const response = models.sequelize.transaction(async (transaction) => {
           const channel = await models.Channel.create(args);
+          if (!args.public) {
+            const members = args.members.filter((m) => m !== user.user.id);
+            members.push(user.user.id);
+            console.log(members);
+            const argument = members.map((m) => ({
+              userId: m,
+              channelId: channel.dataValues.id,
+            }));
+            const member = models.PCMember.bulkCreate(argument);
+          }
+          // return channel;
+          //  });
 
           return {
             ok: true,

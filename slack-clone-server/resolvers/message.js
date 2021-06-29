@@ -20,6 +20,25 @@ export default {
   Query: {
     messages: requireAuth.createResolver(
       async (parents, args, { models, user }, info) => {
+        const channel = await models.Channel.findOne(
+          {
+            where: {
+              id: args.channelId,
+            },
+          },
+          { raw: true }
+        );
+        if (!channel.public) {
+          const membership = await models.PCMember.findOne({
+            where: {
+              channelId: args.channelId,
+              userId: user.user.id,
+            },
+          });
+          if (!membership) {
+            throw new Error("Unauthorized");
+          }
+        }
         try {
           const message = await models.Message.findAll(
             {

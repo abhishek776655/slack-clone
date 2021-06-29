@@ -3,7 +3,7 @@ import { Input, Button, FormField, Form } from "semantic-ui-react";
 import { Formik, ErrorMessage } from "formik";
 import { gql, useMutation } from "@apollo/client";
 
-const INIVITE_PEOPLE = gql`
+const INVITE_PEOPLE = gql`
   mutation ($email: String!, $teamId: Int!) {
     inviteMember(email: $email, teamId: $teamId) {
       ok
@@ -21,7 +21,7 @@ const INIVITE_PEOPLE = gql`
 `;
 
 export default function InvitePeopleModal(props) {
-  const [onInviteMember, { data }] = useMutation(INIVITE_PEOPLE, {
+  const [onInviteMember, { data }] = useMutation(INVITE_PEOPLE, {
     update(cache, { data: { inviteMember } }) {
       const { ok, user } = inviteMember;
       if (!ok) {

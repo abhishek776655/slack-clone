@@ -15,10 +15,10 @@ const CREATE_DIRECT_MESSAGE = gql`
 `;
 
 const DIRECT_MESSAGE_ME_QUERY = gql`
-  query ($userId: Int!) {
-    getUser(userId: $userId) {
-      username
-    }
+  query {
+    # getUser(userId: $userId) {
+    #   username
+    # }
     me {
       id
       email
@@ -127,6 +127,7 @@ const DirectMessages = ({ match: { params } }) => {
     return null;
   }
   const { teams } = data.me;
+
   if (teams && teams.length === 0) {
     return <Redirect to="/createTeam" />;
   }
@@ -142,7 +143,7 @@ const DirectMessages = ({ match: { params } }) => {
     teamIdx = 0;
   }
   const team = teams[teamIdx];
-
+  console.log("DM", team);
   let isOwner = false;
   let username = "";
   try {
@@ -166,7 +167,10 @@ const DirectMessages = ({ match: { params } }) => {
           username={username}
         />
         <div className="grid grid-rows-layout">
-          <ChannelHeader channelName={data.getUser.username} />
+          <ChannelHeader
+            directMessageMembers={team.directMessageMembers}
+            otherUserId={userIdInt}
+          />
           <DirectMessageContainer teamId={team.id} userId={userIdInt} />
           {
             <SendMessage
@@ -192,4 +196,3 @@ const DirectMessages = ({ match: { params } }) => {
 };
 
 export default DirectMessages;
-DirectMessages.whyDidYouRender = true;
