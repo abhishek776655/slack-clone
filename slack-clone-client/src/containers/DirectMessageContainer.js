@@ -2,6 +2,7 @@ import { gql, useQuery } from "@apollo/client";
 import React, { useEffect, useState, useRef } from "react";
 import Dropzone from "react-dropzone";
 import { Button } from "@material-ui/core";
+import Message from "../components/Message";
 import { Comment } from "semantic-ui-react";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
@@ -143,7 +144,7 @@ const DirectMessageContainer = ({ teamId, userId }) => {
                     <Comment.Metadata>
                       <div>{message.createdAt}</div>
                     </Comment.Metadata>
-                    <Comment.Text>{message.text}</Comment.Text>
+                    <Message message={message} />
                     <Comment.Actions>
                       <Comment.Action>Reply</Comment.Action>
                     </Comment.Actions>

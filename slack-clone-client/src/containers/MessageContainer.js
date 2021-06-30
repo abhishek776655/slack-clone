@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Button } from "@material-ui/core";
 import { Comment } from "semantic-ui-react";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import Message from "../components/Message";
 
 const MESSAGES = gql`
   query ($channelId: Int!, $cursor: Date) {
@@ -129,7 +130,7 @@ const MessageContainer = ({ channelId }) => {
               <Comment.Metadata>
                 <div>{new Date(message.createdAt).getDay()}</div>
               </Comment.Metadata>
-              <Comment.Text>{message.text}</Comment.Text>
+              <Message message={message} />
               <Comment.Actions>
                 <Comment.Action>Reply</Comment.Action>
               </Comment.Actions>
