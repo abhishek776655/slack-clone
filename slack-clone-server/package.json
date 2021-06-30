@@ -4,13 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --exec babel-node index.js"
+    "build": "babel src -d dist",
+    "server": "node dist/index.js",
+    "start": "nodemon --exec babel-node src/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-stage-3": "^6.24.1",
     "eslint": "^7.24.0",
@@ -19,6 +22,7 @@
   "dependencies": {
     "@graphql-tools/merge": "^6.2.13",
     "apollo-server": "^2.23.0",
+    "babel-runtime": "^6.26.0",
     "bcrypt": "^5.0.1",
     "dataloader": "^2.0.0",
     "graphql": "^15.5.0",
