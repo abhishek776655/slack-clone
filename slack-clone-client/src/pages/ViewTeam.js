@@ -48,7 +48,8 @@ const ViewTeam = ({ match: { params } }) => {
     console.log(error);
     return null;
   }
-  const { teams } = data.me;
+  const { id, teams } = data.me;
+  console.log("id", id);
   console.log(data);
   if (teams && teams.length === 0) {
     return <Redirect to="/createTeam" />;
@@ -76,6 +77,7 @@ const ViewTeam = ({ match: { params } }) => {
   let isOwner = false;
   let username = "";
   console.log(team.directMessageMembers);
+
   try {
     const token = localStorage.getItem("token");
     const { user } = decode(token);
@@ -84,9 +86,9 @@ const ViewTeam = ({ match: { params } }) => {
     console.log(isOwner);
   } catch (e) {}
   return (
-    <div className="h-screen grid grid-cols-1 grid-rows-header ">
+    <div className="h-screen grid grid-cols-1 grid-rows-header">
       <div className="bg-purple-dark">header</div>
-      <div className="grid h-full grid-cols-layout overflow-y-hidden">
+      <div className="grid h-full grid-cols-layout overflow-hidden">
         <Sidebar
           teams={teams.map((t) => ({
             id: t.id,
@@ -94,8 +96,9 @@ const ViewTeam = ({ match: { params } }) => {
           }))}
           team={team}
           username={username}
+          currentUserId={id}
         />
-        <div className="grid grid-rows-layout">
+        <div className="grid grid-rows-layout overflow-hidden">
           {channel && <ChannelHeader channelName={channel.name} />}
           {channel && <MessageContainer channelId={channel.id} />}
           {channel && (

@@ -10,6 +10,7 @@ const Sidebar = (props) => {
   const [openModal, setOpenModal] = useState(false);
   const [openInviteModal, setOpenInviteModal] = useState(false);
   const [openDirectMessageModal, setOpenDirectMessageModal] = useState(false);
+  console.log(props.currentUserId);
   return (
     <div className="grid h-full grid-cols-sidebar">
       <Teams teams={teams} />
@@ -29,6 +30,7 @@ const Sidebar = (props) => {
         showModal={openModal}
         setShowModal={setOpenModal}
         teamId={team.id}
+        currentUserId={props.currentUserId}
       />
       <DirectMessageModal
         showModal={openDirectMessageModal}

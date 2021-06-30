@@ -30,6 +30,7 @@ const CREATE_CHANNEL = gql`
 
 export default function Modal(props) {
   console.log(props.teamId);
+  console.log("user", props.currentUserId);
   const [onCreateChannel, { data }] = useMutation(CREATE_CHANNEL, {
     update(cache, { data: { createChannel } }) {
       const { ok, channel } = createChannel;
@@ -217,6 +218,7 @@ export default function Modal(props) {
                                 console.log(e.target);
                                 setFieldValue("members", value);
                               }}
+                              currentUserId={props.currentUserId}
                             />
                           ) : null}
                         </FormGroup>

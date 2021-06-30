@@ -166,7 +166,7 @@ const DirectMessages = ({ match: { params } }) => {
           team={team}
           username={username}
         />
-        <div className="grid grid-rows-layout">
+        <div className="grid grid-rows-layout overflow-hidden">
           <ChannelHeader
             directMessageMembers={team.directMessageMembers}
             otherUserId={userIdInt}

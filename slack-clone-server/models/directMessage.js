@@ -6,7 +6,14 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.STRING,
       },
     },
-    { underscored: true }
+    {
+      underscored: true,
+      indexes: [
+        {
+          fields: ["created_at"],
+        },
+      ],
+    }
   );
   directMessage.associate = (models) => {
     directMessage.belongsTo(models.User, {

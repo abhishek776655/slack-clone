@@ -20,24 +20,29 @@ const MultiSelectUser = ({
   placeholder,
   handleChange,
   value,
+  currentUserId,
 }) => {
   const { data, loading } = useQuery(GET_TEAM_MEMBERS, {
     variables: { teamId: teamId },
   });
+
   if (loading) {
     return;
   }
+  console.log(currentUserId);
   return (
     <Autocomplete
       multiple
       className={className}
       id="tags-outlined"
-      options={data.getTeamMembers.map((m) => {
-        return {
-          ...m,
-          title: m.username,
-        };
-      })}
+      options={data.getTeamMembers
+        .filter((e) => e.id !== currentUserId)
+        .map((m) => {
+          return {
+            ...m,
+            title: m.username,
+          };
+        })}
       value={value}
       onChange={handleChange}
       loading={loading}

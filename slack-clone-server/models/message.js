@@ -8,7 +8,14 @@ export default (sequelize, DataTypes) => {
       url: DataTypes.STRING,
       filetype: DataTypes.STRING,
     },
-    { underscored: true }
+    {
+      underscored: true,
+      indexes: [
+        {
+          fields: ["created_at"],
+        },
+      ],
+    }
   );
   Message.associate = (models) => {
     Message.belongsTo(models.Channel, {

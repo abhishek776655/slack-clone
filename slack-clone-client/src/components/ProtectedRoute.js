@@ -5,7 +5,10 @@ import decode from "jwt-decode";
 const isAuth = () => {
   const token = localStorage.getItem("token");
   try {
-    decode(token);
+    const { exp } = decode(token);
+    if (new Date(exp) / 1000 > exp) {
+      return false;
+    }
   } catch (e) {
     return false;
   }

@@ -1,7 +1,7 @@
 import requireAuth, { directMessageControlAction } from "../permission";
 const { Op } = require("sequelize");
-const { PubSub, withFilter } = require("apollo-server");
-const pubsub = new PubSub();
+const { withFilter } = require("apollo-server");
+import pubsub from "../pubsub";
 
 const NEW_DIRECT_MESSAGE = "NEW_DIRECT_MESSAGE";
 export default {
@@ -29,8 +29,9 @@ export default {
     directMessages: requireAuth.createResolver(
       async (parents, args, { models, user }, info) => {
         try {
-          const message = await models.DirectMessage.findAll({
-            order: [["createdAt", "ASC"]],
+          const options = {
+            order: [["createdAt", "DESC"]],
+            limit: 15,
             where: {
               teamId: args.teamId,
               [Op.or]: [
@@ -48,7 +49,14 @@ export default {
                 },
               ],
             },
-          });
+          };
+
+          if (args.cursor) {
+            options.where.created_at = {
+              [Op.lt]: args.cursor,
+            };
+          }
+          const message = await models.DirectMessage.findAll(options);
           console.warn(message);
           return message;
         } catch (e) {

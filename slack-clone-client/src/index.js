@@ -44,11 +44,15 @@ const wsLink = new WebSocketLink({
   uri: "ws://localhost:4000/subscriptions",
   options: {
     reconnect: true,
-    connectionParams: {
-      authToken: localStorage.getItem("token"),
-    },
+    lazy: true,
+    connectionParams: () => ({
+      authToken:
+        console.log("connectParams", localStorage.getItem("token")) ||
+        localStorage.getItem("token"),
+    }),
   },
 });
+
 const splitLink = split(
   ({ query }) => {
     const definition = getMainDefinition(query);
@@ -77,4 +81,4 @@ ReactDOM.render(
   document.getElementById("root")
 );
 
-export { FireBaseContext };
+export { FireBaseContext, wsLink };

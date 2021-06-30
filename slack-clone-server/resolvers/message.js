@@ -1,6 +1,8 @@
-const { PubSub, withFilter } = require("apollo-server");
+const { withFilter } = require("apollo-server");
 import requireAuth, { requireControlAction } from "../permission";
-const pubsub = new PubSub();
+import pubsub from "../pubsub";
+const { Op } = require("sequelize");
+
 const NEW_CHANNEL_MESSAGE = "NEW_CHANNEL_MESSAGE";
 export default {
   Subscription: {
@@ -39,17 +41,24 @@ export default {
             throw new Error("Unauthorized");
           }
         }
+        console.log(args);
         try {
-          const message = await models.Message.findAll(
-            {
-              order: [["createdAt", "ASC"]],
-              where: {
-                channelId: args.channelId,
-              },
+          const options = {
+            order: [["createdAt", "DESC"]],
+            where: {
+              channelId: args.channelId,
             },
-            { raw: true }
-          );
+            limit: 15,
+          };
+          if (args.cursor) {
+            console.log("cursor", args.cursor);
+            options.where.created_at = {
+              [Op.lt]: args.cursor,
+            };
+          }
 
+          const message = await models.Message.findAll(options, { raw: true });
+          console.log(message);
           return message;
         } catch (e) {
           console.log(e);

@@ -122,18 +122,9 @@ export default {
     ),
   },
   Team: {
-    channels: async ({ id }, args, { models, user }) => {
-      const channels = await models.sequelize.query(
-        `select distinct on (id) *
-      from channels as c, pc_members as pc 
-      where team_id = :teamId and public = true or (pc.user_id = :user_id and c.id = pc.channel_id);`,
-        {
-          replacements: { user_id: user.user.id, teamId: id },
-          model: models.Channel,
-          raw: true,
-        }
-      );
-      return channels;
+    channels: async ({ id }, args, { channelLoader }) => {
+      console.log(channelLoader.load);
+      return channelLoader.load(id);
     },
     directMessageMembers: async ({ id }, args, { models, user }) => {
       const users = await models.sequelize.query(

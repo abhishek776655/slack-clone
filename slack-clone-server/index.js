@@ -2,7 +2,10 @@ import { ApolloServer, makeExecutableSchema } from "apollo-server";
 import resolvers from "./resolvers";
 import models from "./models";
 import typeDefs from "./schema";
+const DataLoader = require("dataloader");
 import { getUser } from "./auth";
+
+import channelBatcher from "./batchFunction";
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 const SECRET = "rfdeskfpsgjkdjfglkdsj";
@@ -37,7 +40,15 @@ const server = new ApolloServer({
 
       const user = getUser(token, SECRET);
 
-      return { user, models, SECRET, SECRET2 };
+      return {
+        user,
+        models,
+        SECRET,
+        SECRET2,
+        channelLoader: new DataLoader((ids) =>
+          channelBatcher(ids, models, user)
+        ),
+      };
     }
   },
 });

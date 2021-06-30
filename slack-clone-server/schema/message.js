@@ -1,6 +1,7 @@
 import { gql } from "apollo-server";
 
 const message = gql`
+  scalar Date
   type Message {
     text: String
     id: Int!
@@ -8,13 +9,13 @@ const message = gql`
     channel: Channel!
     url: String
     filetype: String
-    createdAt: String!
+    createdAt: Date!
   }
   type Subscription {
     newChannelMessage(channelId: Int!): Message!
   }
   type Query {
-    messages(channelId: Int!): [Message]!
+    messages(channelId: Int!, cursor: Date): [Message]!
   }
   type Mutation {
     createMessage(

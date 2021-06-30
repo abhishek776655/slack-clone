@@ -9,6 +9,7 @@ import {
   Message,
 } from "semantic-ui-react";
 import { gql, useMutation } from "@apollo/client";
+import { wsLink } from "../index";
 
 const LOGIN = gql`
   mutation ($email: String!, $password: String!) {
@@ -33,7 +34,7 @@ const Login = (props) => {
     setPasswordError("");
     setEmailError("");
     try {
-      onLogin({ variables: { email, password } });
+      onLogin({ variables: { email, password } }).then(() => {});
     } catch (e) {
       console.log(e);
     }
@@ -45,6 +46,7 @@ const Login = (props) => {
       if (ok) {
         localStorage.setItem("token", token);
         localStorage.setItem("refreshToken", refreshToken);
+        wsLink.subscriptionClient.tryReconnect();
         props.history.push("/view-team");
       } else {
         errors.forEach(({ path, message }) => {

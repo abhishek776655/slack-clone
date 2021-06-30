@@ -1,18 +1,23 @@
 import { gql } from "apollo-server";
 
 const directMessage = gql`
+  scalar Date
   type DirectMessage {
     text: String
     id: Int!
     receiverId: Int!
     sender: User!
-    createdAt: String!
+    createdAt: Date!
     url: String
     filetype: String
   }
 
   type Query {
-    directMessages(teamId: Int!, otherUserId: Int!): [DirectMessage]!
+    directMessages(
+      teamId: Int!
+      otherUserId: Int!
+      cursor: Date
+    ): [DirectMessage]!
   }
   type Mutation {
     createDirectMessage(
