@@ -1,7 +1,8 @@
 import requireAuth, { directMessageControlAction } from "../permission";
 const { Op } = require("sequelize");
-const { withFilter } = require("apollo-server");
-import pubsub from "../pubsub";
+const { withFilter, PubSub } = require("apollo-server");
+//import pubsub from "../pubsub";
+const pubsub = new PubSub();
 
 const NEW_DIRECT_MESSAGE = "NEW_DIRECT_MESSAGE";
 export default {

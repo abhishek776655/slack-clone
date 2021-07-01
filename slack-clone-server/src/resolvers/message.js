@@ -1,7 +1,8 @@
-const { withFilter } = require("apollo-server");
+const { withFilter, PubSub } = require("apollo-server");
 import requireAuth, { requireControlAction } from "../permission";
-import pubsub from "../pubsub";
+//import pubsub from "../pubsub";
 const { Op } = require("sequelize");
+const pubsub = new PubSub();
 
 const NEW_CHANNEL_MESSAGE = "NEW_CHANNEL_MESSAGE";
 export default {

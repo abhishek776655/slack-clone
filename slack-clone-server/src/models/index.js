@@ -1,13 +1,40 @@
 import Sequelize from "sequelize";
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
+require("dotenv").config({ path: `./.env.${process.env.NODE_ENV}` });
+console.log(process.env);
 export default async () => {
   let maxReconnects = 20;
   let connected = false;
-  const sequelize = new Sequelize("slack", "postgres", "getlost", {
-    dialect: "postgres",
-    host: process.env.DB_HOST || "localhost",
-  });
+  console.log("env", process.env.NODE_ENV);
+  console.log("url", process.env.DATABASE_URL);
+  let sequelize;
+  if (process.env.NODE_ENV === "development") {
+    console.log("development");
+    console.log(
+      process.env.DB_NAME,
+      process.env.DB_USER,
+      process.env.DB_PASSWORD
+    );
+    sequelize = new Sequelize(
+      process.env.DB_NAME,
+      process.env.DB_USER,
+      process.env.DB_PASSWORD,
+      {
+        dialect: "postgres",
+        host: process.env.DB_HOST,
+      }
+    );
+  } else {
+    sequelize = new Sequelize(process.env.DATABASE_URL, {
+      dialect: "postgres",
+      dialectOptions: {
+        ssl: {
+          require: true, // This will help you. But you will see nwe error
+          rejectUnauthorized: false, // This line will fix new error
+        },
+      },
+    });
+  }
   while (!connected && maxReconnects) {
     try {
       // eslint-disable-next-line no-await-in-loop
@@ -15,6 +42,7 @@ export default async () => {
       connected = true;
     } catch (err) {
       console.log("reconnecting in 5 seconds");
+
       // eslint-disable-next-line no-await-in-loop
       await sleep(5000);
       maxReconnects -= 1;

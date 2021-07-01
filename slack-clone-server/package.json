@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build": "babel src -d dist",
-    "server": "node dist/index.js",
-    "start": "nodemon --exec babel-node src/index.js"
+    "start": "export NODE_ENV=production && node dist/index.js",
+    "build:staging":"export NODE_ENV=production && nodemon --exec babel-node src/index.js",
+    "develop": "export NODE_ENV=development && nodemon --exec babel-node src/index.js"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +26,7 @@
     "babel-runtime": "^6.26.0",
     "bcrypt": "^5.0.1",
     "dataloader": "^2.0.0",
+    "dotenv": "^10.0.0",
     "graphql": "^15.5.0",
     "graphql-redis-subscriptions": "^2.4.0",
     "jsonwebtoken": "^8.5.1",
